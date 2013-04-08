@@ -22,6 +22,9 @@ along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 <#assign complexTypes = ["String", "ByteArray", "Date"]/>
 package ${entity.javaPackage};
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 <#if entity.toManyRelations?has_content>
 import java.util.List;
 </#if>
@@ -257,4 +260,66 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
 ${keepMethods!}    // KEEP METHODS END
 
 </#if>
+
+<#--
+##########################################
+########## Parcelable operations ######
+##########################################
+-->
+//  @Override
+  public int describeContents() {
+    return 0;
+  }
+    
+//  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+   <#list entity.properties as property>
+   <#if 
+      toCursorType[property.propertyType]??>
+       <#if !property.notNull>
+      dest.writeByte((byte)(${property.propertyName} != null ? 1 : 0));
+      </#if> 
+      dest.write${toCursorType[property.propertyType]}(${property.propertyName});<#elseif 
+      property.propertyType == "Date">
+      if (${property.propertyName} != null) {
+        dest.writeByte((byte)(1));
+        dest.writeLong(${property.propertyName}.getTime());
+      } else {
+         dest.writeByte((byte)(0));
+      } <#else>
+      dest.writeParcelable( ${property.propertyName}, flags);
+      </#if> 
+      
+   </#list>
+  }
+ 
+  public static final Parcelable.Creator<${entity.className}> CREATOR = new Parcelable.Creator<${entity.className}>() {
+        public ${entity.className} createFromParcel(Parcel in) {
+            ${entity.className} entity =  new ${entity.className}();
+            <#list entity.properties as property>
+            <#if toCursorType[property.propertyType]?? && property.notNull>
+            entity.${property.propertyName} = in.read${toCursorType[property.propertyType]}();<#elseif 
+            toCursorType[property.propertyType]??>
+            if (in.readByte() == 1) {
+                 entity.${property.propertyName} = in.read${toCursorType[property.propertyType]}();
+            } else {
+                 entity.${property.propertyName} = null;
+            }  <#elseif 
+            property.propertyType == "Date">
+            if (in.readByte() == 1) {
+              entity.${property.propertyName} = new ${property.javaType}(in.readLong());
+            } else {
+              entity.${property.propertyName} = null;
+            } <#else>
+            ${property.javaType}.CREATOR.createFromParcel(in);
+            </#if> 
+ 
+             </#list>
+            return entity;
+        }
+
+        public ${entity.className}[] newArray(int size) {
+            return new ${entity.className}[size];
+        }
+    };
 }
