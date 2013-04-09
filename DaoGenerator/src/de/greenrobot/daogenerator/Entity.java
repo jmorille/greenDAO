@@ -70,6 +70,7 @@ public class Entity {
     private String pkType;
     private String superclass;
 
+    private boolean parceable=false;
     private boolean protobuf;
     private boolean constructors;
     private boolean skipGeneration;
@@ -248,6 +249,11 @@ public class Entity {
     Entity useProtobuf() {
         protobuf = true;
         return this;
+    }
+    
+    
+    public boolean isParceable() {
+        return parceable;
     }
 
     public boolean isProtobuf() {
@@ -431,6 +437,12 @@ public class Entity {
         interfacesToImplement.add("java.io.Serializable");
     }
 
+    public void implementsParceable() {
+        interfacesToImplement.add("android.os.Parcelable");
+        parceable = true;
+    }
+
+    
     public String getSuperclass() {
         return superclass;
     }

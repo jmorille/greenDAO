@@ -22,8 +22,10 @@ along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 <#assign complexTypes = ["String", "ByteArray", "Date"]/>
 package ${entity.javaPackage};
 
+<#if entity.parceable>
 import android.os.Parcel;
 import android.os.Parcelable;
+</#if>
 
 <#if entity.toManyRelations?has_content>
 import java.util.List;
@@ -266,6 +268,8 @@ ${keepMethods!}    // KEEP METHODS END
 ########## Parcelable operations ######
 ##########################################
 -->
+<#if entity.parceable>
+
 //  @Override
   public int describeContents() {
     return 0;
@@ -322,4 +326,5 @@ ${keepMethods!}    // KEEP METHODS END
             return new ${entity.className}[size];
         }
     };
+</#if>    
 }

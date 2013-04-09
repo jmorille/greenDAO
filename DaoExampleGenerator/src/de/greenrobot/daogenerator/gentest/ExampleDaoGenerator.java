@@ -41,6 +41,7 @@ public class ExampleDaoGenerator {
 
     private static void addNote(Schema schema) {
         Entity note = schema.addEntity("Note");
+        note.implementsParceable();
         note.addIdProperty();
         note.addStringProperty("text").notNull();
         note.addStringProperty("comment");
