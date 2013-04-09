@@ -39,23 +39,47 @@ public class ExampleDaoGenerator {
         new DaoGenerator().generateAll(schema, "../DaoExample/src-gen");
     }
 
+    private static void implementsSync(Entity entity) {
+//      entity.implementsInterface("eu.ttbox.androgister.domain.VersioningModel");
+      entity.addBooleanProperty("dirty");
+      entity.addBooleanProperty("deleted").notNull();
+  }
     private static void addNote(Schema schema) {
-        Entity note = schema.addEntity("Note");
+        Entity note = schema.addEntity("Note"); 
         note.implementsParceable();
         note.addIdProperty();
         note.addStringProperty("text").notNull();
         note.addStringProperty("comment");
+        
         note.addDateProperty("date");
     }
 
     private static void addCustomerOrder(Schema schema) {
         Entity customer = schema.addEntity("Customer");
+//        customer.implementsParceable();
         customer.addIdProperty();
+        implementsSync(customer);
         customer.addStringProperty("name").notNull();
-
+        customer.addBooleanProperty("booleanProp");
+        customer.addBooleanProperty("booleanPropNotNull").notNull();
+        customer.addFloatProperty("addFloatProperty");
+        customer.addFloatProperty("addFloatPropertyNotNull").notNull();
+        customer.addDoubleProperty("addDoubleProperty");
+        customer.addDoubleProperty("addDoublePropertyNotNull").notNull();
+        customer.addLongProperty("addLongProperty");
+        customer.addLongProperty("addLongPropertyNotNull").notNull();
+        customer.addIntProperty("addIntProperty");
+        customer.addIntProperty("addIntPropertyNotNull").notNull();
+//        customer.addShortProperty("addShortProperty");
+//        customer.addShortProperty("addShortPropertyNotNull").notNull();
+//        customer.addByteArrayProperty("addByteArrayProperty");
+//        customer.addByteArrayProperty("addByteArrayPropertyNotNull").notNull();
+       
+        
         Entity order = schema.addEntity("Order");
         order.setTableName("ORDERS"); // "ORDER" is a reserved keyword
         order.addIdProperty();
+        order.addIntProperty("priceHT");
         Property orderDate = order.addDateProperty("date").getProperty();
         Property customerId = order.addLongProperty("customerId").notNull().getProperty();
         order.addToOne(customer, customerId);

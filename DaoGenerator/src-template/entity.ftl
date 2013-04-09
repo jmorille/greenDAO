@@ -18,7 +18,8 @@ along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <#assign toBindType = {"Boolean":"Long", "Byte":"Long", "Short":"Long", "Int":"Long", "Long":"Long", "Float":"Double", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
-<#assign toCursorType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
+<#assign toParcelType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob" }/>
+<#assign toParcelType = {"Boolean":"Byte", "Byte":"Short", "Short":"Int", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"ByteArray" }/>
 <#assign complexTypes = ["String", "ByteArray", "Date"]/>
 package ${entity.javaPackage};
 
@@ -277,48 +278,48 @@ ${keepMethods!}    // KEEP METHODS END
     
 //  @Override
   public void writeToParcel(Parcel dest, int flags) {
-   <#list entity.properties as property>
-   <#if 
-      toCursorType[property.propertyType]??>
-       <#if !property.notNull>
-      dest.writeByte((byte)(${property.propertyName} != null ? 1 : 0));
-      </#if> 
-      dest.write${toCursorType[property.propertyType]}(${property.propertyName});<#elseif 
-      property.propertyType == "Date">
+<#list entity.properties as property>
+   <#if toParcelType[property.propertyType]??>
+      <#if !property.notNull>if (${property.propertyName}!=null) {
+        dest.writeByte((byte)1);
+      </#if><#if  property.propertyType == "Boolean">
+        dest.write${toParcelType[property.propertyType]}((byte)(${property.propertyName}  ? 1 : 0)); <#else
+      > dest.write${toParcelType[property.propertyType]}(${property.propertyName});</#if> 
+      <#if !property.notNull>} else { dest.writeByte((byte)0); }</#if> 
+   <#elseif  property.propertyType == "Date">
       if (${property.propertyName} != null) {
         dest.writeByte((byte)(1));
         dest.writeLong(${property.propertyName}.getTime());
       } else {
          dest.writeByte((byte)(0));
       } <#else>
-      dest.writeParcelable( ${property.propertyName}, flags);
-      </#if> 
-      
+        dest.writeParcelable( ${property.propertyName}, flags);
+      </#if>  
    </#list>
   }
  
   public static final Parcelable.Creator<${entity.className}> CREATOR = new Parcelable.Creator<${entity.className}>() {
         public ${entity.className} createFromParcel(Parcel in) {
             ${entity.className} entity =  new ${entity.className}();
-            <#list entity.properties as property>
-            <#if toCursorType[property.propertyType]?? && property.notNull>
-            entity.${property.propertyName} = in.read${toCursorType[property.propertyType]}();<#elseif 
-            toCursorType[property.propertyType]??>
+ <#list entity.properties as property> 
+    <#if toParcelType[property.propertyType]?? && property.notNull>
+            entity.${property.propertyName} = in.read${toParcelType[property.propertyType]}() <#if  property.propertyType == "Boolean"> == 1 </#if>;<#elseif 
+    toParcelType[property.propertyType]??>
             if (in.readByte() == 1) {
-                 entity.${property.propertyName} = in.read${toCursorType[property.propertyType]}();
+                 entity.${property.propertyName} = in.read${toParcelType[property.propertyType]}() <#if  property.propertyType == "Boolean"> == 1 </#if>;
             } else {
                  entity.${property.propertyName} = null;
             }  <#elseif 
-            property.propertyType == "Date">
+    property.propertyType == "Date">
             if (in.readByte() == 1) {
               entity.${property.propertyName} = new ${property.javaType}(in.readLong());
             } else {
               entity.${property.propertyName} = null;
             } <#else>
             ${property.javaType}.CREATOR.createFromParcel(in);
-            </#if> 
+    </#if> 
  
-             </#list>
+</#list>
             return entity;
         }
 

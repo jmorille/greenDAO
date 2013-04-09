@@ -19,6 +19,7 @@ along with greenDAO Generator.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <#assign toBindType = {"Boolean":"Long", "Byte":"Long", "Short":"Long", "Int":"Long", "Long":"Long", "Float":"Double", "Double":"Double", "String":"String", "ByteArray":"Blob", "Date": "Long" } />
 <#assign toCursorType = {"Boolean":"Short", "Byte":"Short", "Short":"Short", "Int":"Int", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"Blob", "Date": "Long"  } />
+<#assign toContentValueType = {"Boolean":"Boolean", "Byte":"Short", "Short":"Short", "Int":"Integer", "Long":"Long", "Float":"Float", "Double":"Double", "String":"String", "ByteArray":"ByteArray", "Date": "Long"  } />
 package ${entity.javaPackageDao};
 
 import android.content.ContentValues;
@@ -209,9 +210,8 @@ as property>${property.columnName}<#if property_has_next>,</#if></#list>);");
         ${entity.className} entity = new ${entity.className}();
 <#list entity.properties as property>   
         entity.set${property.propertyName?cap_first}(<#if
-   property.propertyType == "Date">  
-      values.getAs${toCursorType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)==null? null: new ${property.javaType}(values.getAs${toCursorType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)) <#else
-   >  values.getAs${toCursorType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)</#if
+   property.propertyType == "Date">values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)==null? null: new ${property.javaType}(values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)) <#else
+   >values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)</#if
    >); 
 </#list>        
         //   attachEntity(entity)
