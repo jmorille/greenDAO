@@ -89,4 +89,6 @@ public class ExampleDaoGenerator {
         customerToOrders.orderAsc(orderDate);
     }
 
+    
+ 
 }

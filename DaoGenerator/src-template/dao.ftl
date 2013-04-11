@@ -183,40 +183,8 @@ as property>${property.columnName}<#if property_has_next>,</#if></#list>);");
 </#if>  
     }    
 
-<#--
-############################## readContentValue ############################## 
--->
-    public ContentValues readContentValues(Cursor cursor, int offset) {
-        ContentValues values = new ContentValues();
-<#list entity.properties as property> 
-        values.put(Properties.${property.propertyName?cap_first}.columnName,cursor.isNull(offset + ${property_index})? null: cursor.get${toCursorType[property.propertyType]}(offset + ${property_index})  );
-</#list>  
-        return values;
-    }
 
-    public ContentValues readContentValues(${entity.className} entity) {
-        ContentValues values = new ContentValues();
-<#list entity.properties as property> 
-        values.put(Properties.${property.propertyName?cap_first}.columnName, <#if
-   property.propertyType == "Date">entity.get${property.propertyName?cap_first}()==null? null: entity.get${property.propertyName?cap_first}().getTime() <#elseif 
-   property.notNull>entity.get${property.propertyName?cap_first}() <#else
-   > entity.get${property.propertyName?cap_first}() </#if
-   >);
-</#list>  
-        return values;
-    }    
-
-     public ${entity.className} readEntity(ContentValues values) {
-        ${entity.className} entity = new ${entity.className}();
-<#list entity.properties as property>   
-        entity.set${property.propertyName?cap_first}(<#if
-   property.propertyType == "Date">values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)==null? null: new ${property.javaType}(values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)) <#else
-   >values.getAs${toContentValueType[property.propertyType]}(Properties.${property.propertyName?cap_first}.columnName)</#if
-   >); 
-</#list>        
-        //   attachEntity(entity)
-        return entity;
-     }
+   
  
     /** @inheritdoc */
     @Override
@@ -248,7 +216,9 @@ as property>${property.columnName}<#if property_has_next>,</#if></#list>);");
         return entity;
 <#else>
 <#--
-############################## readEntity non-protobuff, setters ############################## 
+##########<#--
+############################## readContentValue ############################## 
+-->#################### readEntity non-protobuff, setters ############################## 
 -->
         ${entity.className} entity = new ${entity.className}();
         readEntity(cursor, entity, offset);
@@ -337,4 +307,10 @@ as property>${property.columnName}<#if property_has_next>,</#if></#list>);");
 <#if entity.toOneRelations?has_content>
     <#include "dao-deep.ftl">
 </#if>
+
+<#--
+############################## readContentValue ############################## 
+-->
+<#include "dao-cursor-helper.ftl">
+
 }
