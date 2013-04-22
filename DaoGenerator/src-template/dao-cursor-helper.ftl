@@ -62,11 +62,9 @@
         
 <#list entity.properties as property>    
         public ${property.javaType} get${property.propertyName?cap_first}(Cursor cursor) {   
-            ${toCursorType[property.propertyType]} cursorVal = cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx);
+            ${property.javaType} cursorVal = cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx)<#if  property.propertyType == "Boolean"> !=0</#if>;
     //${property.propertyType} 
-         <#if  property.propertyType == "Boolean"
->              return cursorVal.intValue()  == 1 ;<#elseif
-           property.propertyType == "Date"
+         <#if property.propertyType == "Date"
 >            return new ${property.javaType}(cursorVal);<#else
 >            return cursorVal;</#if>   
         }          
