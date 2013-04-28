@@ -38,13 +38,17 @@
 ############################## cursorHelper ############################## 
 --> 
 
-    public ${entity.className}CursorHelper get${entity.className}CursorHelper(Cursor cursor){
-        return new ${entity.className}CursorHelper().initWrapper(cursor);
+    public ${entity.className}CursorHelper getCursorHelper(Cursor cursor){
+        ${entity.className}CursorHelper helper = new ${entity.className}CursorHelper();
+        if (cursor!=null) {
+        	helper.initWrapper(cursor);
+        }
+        return helper;
     }
     
     public static class ${entity.className}CursorHelper {
         
-        boolean isNotInit = true;
+       public boolean isNotInit = true;
         
 <#list entity.properties as property>        
         public int ${property.propertyName}Idx = -1;
