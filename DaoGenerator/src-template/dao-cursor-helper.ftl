@@ -61,12 +61,40 @@
             isNotInit = false;
             return this;
         }
+    <#-- ### Read as map ### -->    
+    public ContentValues readContentValues(Cursor cursor) {
+        if (isNotInit) {
+           initWrapper(cursor);
+        }
+        ContentValues values = new ContentValues(); 
+<#list entity.properties as property> 
+        if (${property.propertyName}Idx > -1) {
+           values.put(Properties.${property.propertyName?cap_first}.columnName,cursor.isNull(${property.propertyName}Idx)? null: cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx)<#if  property.propertyType == "Boolean"> !=0</#if>  );
+        }
+</#list>  
+        return values;
+    }  
+    
+     public android.os.Bundle readBundleValues(Cursor cursor) {
+        if (isNotInit) {
+           initWrapper(cursor);
+        }
+        android.os.Bundle values = new android.os.Bundle(); 
+<#list entity.properties as property>      
+        if (${property.propertyName}Idx > -1) {
+           values.put${property.propertyType}(Properties.${property.propertyName?cap_first}.columnName,cursor.isNull(${property.propertyName}Idx)? null: cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx)<#if  property.propertyType == "Boolean"> !=0</#if>  );
+        }   
+</#list>  
+        return values;
+     }        
 
+    <#-- ### UI Field Writer ### -->    
     private ${entity.className}CursorHelper setTextWithIdx(android.widget.TextView view, Cursor cursor, int idx) {
         view.setText(cursor.getString(idx));
         return this;
-    }     
-        
+    }
+         
+    <#-- ### Property Accessors ### -->            
 <#list entity.properties as property>    
         public ${property.javaType} get${property.propertyName?cap_first}(Cursor cursor) {   
             ${property.javaType} cursorVal = cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx)<#if  property.propertyType == "Boolean"> !=0</#if>;
@@ -82,7 +110,7 @@
         }          
   </#if>      
   
-   <#-- ### Bind component View ###  --> 
+   <#-- ### UI Field Writer ###  --> 
   <#if  property.propertyType == "String">     
         public ${entity.className}CursorHelper setText${property.propertyName?cap_first}(android.widget.TextView view, Cursor cursor) {
             return setTextWithIdx(view, cursor, ${property.propertyName}Idx);

@@ -109,8 +109,16 @@ property>${property.javaType} ${property.propertyName}<#if property_has_next>, <
         this.${property.propertyName} = ${property.propertyName};
 </#list>
     }
+
+ <#include "entity-clone.ftl"> 
+
+
 </#if>
 
+ 
+ 
+ 
+ 
 <#if entity.active>
     /** called by internal mechanisms, do not call yourself. */
     public void __setDaoSession(DaoSession daoSession) {
