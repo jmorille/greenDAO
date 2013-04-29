@@ -62,7 +62,10 @@
             return this;
         }
 
-         
+    private ${entity.className}CursorHelper setTextWithIdx(android.widget.TextView view, Cursor cursor, int idx) {
+        view.setText(cursor.getString(idx));
+        return this;
+    }     
         
 <#list entity.properties as property>    
         public ${property.javaType} get${property.propertyName?cap_first}(Cursor cursor) {   
@@ -77,7 +80,15 @@
         public ${toCursorType[property.propertyType]} get${property.propertyName?cap_first}Db(Cursor cursor) {   
             return cursor.get${toCursorType[property.propertyType]}(${property.propertyName}Idx);
         }          
+  </#if>      
+  
+   <#-- ### Bind component View ###  --> 
+  <#if  property.propertyType == "String">     
+        public ${entity.className}CursorHelper setText${property.propertyName?cap_first}(android.widget.TextView view, Cursor cursor) {
+            return setTextWithIdx(view, cursor, ${property.propertyName}Idx);
+        }       
   </#if>       
+     
 </#list>     
          
     }
