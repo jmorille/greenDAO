@@ -111,11 +111,11 @@
   </#if>      
   
    <#-- ### UI Field Writer ###  --> 
-  <#if  property.propertyType == "String">     
+ 
         public ${entity.className}CursorHelper setText${property.propertyName?cap_first}(android.widget.TextView view, Cursor cursor) {
             return setTextWithIdx(view, cursor, ${property.propertyName}Idx);
         }       
-  </#if>       
+     
      
 </#list>     
          
