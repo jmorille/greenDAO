@@ -65,7 +65,7 @@ public class QueryBuilder<T> {
     private Integer limit;
 
     private Integer offset;
-    
+
     /** For internal use by greenDAO only. */
     public static <T2> QueryBuilder<T2> internalCreate(AbstractDao<T2, ?> dao) {
         return new QueryBuilder<T2>(dao);
@@ -310,6 +310,10 @@ public class QueryBuilder<T> {
         appendWhereClause(builder, tablename);
         String sql = builder.toString();
 
+        // Remove table aliases, not supported for DELETE queries.
+        // TODO(?): don't create table aliases in the first place.
+        sql = sql.replace(tablePrefix + ".'", tablename + ".'");
+
         if (LOG_SQL) {
             DaoLog.d("Built SQL for delete query: " + sql);
         }
@@ -326,9 +330,9 @@ public class QueryBuilder<T> {
      */
     public CountQuery<T> buildCount() {
         String tablename = dao.getTablename();
-        String baseSql = SqlUtils.createSqlSelectCountStar(tablename);
+        String baseSql = SqlUtils.createSqlSelectCountStar(tablename, tablePrefix);
         StringBuilder builder = new StringBuilder(baseSql);
-        appendWhereClause(builder, tablename);
+        appendWhereClause(builder, tablePrefix);
         String sql = builder.toString();
 
         if (LOG_SQL) {
